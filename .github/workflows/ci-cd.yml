@@ -74,11 +74,11 @@ jobs:
           nohup java -jar target/ink3-auth-${{ steps.extract_version.outputs.version }}.jar --server.port=10256 > app.log 2>&1 &
           echo $! > app.pid
 
-      - name: Verify JAR file
-        run: ls -lh target/*.jar
-        
       - name: Wait for application to start
         run: sleep 15
+
+      - name: Check JAR file exists
+        run: ls -lh target/ink3-auth-${{ steps.extract_version.outputs.version }}.jar
 
       - name: Check health endpoint
         run: curl --fail http://localhost:10256/actuator/health
@@ -92,7 +92,6 @@ jobs:
       - name: Print app log if health check fails
         if: failure()
         run: cat app.log
-
 
   deploy:
     name: Deploy to Linux Server
