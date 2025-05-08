@@ -1,3 +1,9 @@
 spring:
   application:
     name: Ink3 - Auth
+  profiles:
+    active: local
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
