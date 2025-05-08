@@ -74,6 +74,9 @@ jobs:
           nohup java -jar target/auth-${{ steps.extract_version.outputs.version }}.jar --server.port=10256 > app.log 2>&1 &
           echo $! > app.pid
 
+      - name: Verify JAR file
+        run: ls -lh target/*.jar
+        
       - name: Wait for application to start
         run: sleep 15
 
