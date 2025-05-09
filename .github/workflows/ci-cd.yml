@@ -40,8 +40,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Build all modules with Maven
-        run: mvn clean install -DskipTests=true -B
+      - name: Build with coverage
+        run: mvn clean verify -B
 
   sonar-analysis:
     name: SonarQube Analysis
@@ -60,11 +60,12 @@ jobs:
 
       - name: SonarQube Scan
         run: |
-          mvn clean verify sonar:sonar \
+          mvn verify sonar:sonar \
             -Dsonar.projectKey=ink3_auth_server \
             -Dsonar.projectName='ink3_auth_server' \
             -Dsonar.host.url=http://s4.java21.net:9000 \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
       - name: Check coverage threshold
         run: |
