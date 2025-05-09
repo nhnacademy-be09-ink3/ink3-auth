@@ -66,6 +66,18 @@ jobs:
             -Dsonar.host.url=http://s4.java21.net:9000 \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
+      - name: Check coverage threshold
+        run: |
+          LINE_COVERAGE=$(grep -A1 "<counter type=\"LINE\"" target/site/jacoco/jacoco.xml | grep -oP 'covered="\K[0-9]+' | paste -sd+ - | bc)
+          LINE_MISSED=$(grep -A1 "<counter type=\"LINE\"" target/site/jacoco/jacoco.xml | grep -oP 'missed="\K[0-9]+' | paste -sd+ - | bc)
+          TOTAL=$((LINE_COVERAGE + LINE_MISSED))
+          PERCENT=$((LINE_COVERAGE * 100 / TOTAL))
+          echo "Coverage: $PERCENT%"
+          if [ "$PERCENT" -lt 80 ]; then
+            echo "Coverage is below 80%! Failing build."
+            exit 1
+          fi
+
   test:
     needs: build
     runs-on: ubuntu-latest
