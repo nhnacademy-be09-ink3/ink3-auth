@@ -1,0 +1,21 @@
+spring:
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      database: 295
+      password: ${REDIS_PASSWORD}
+server:
+  port: 8081
+jwt:
+  private-key-path: classpath:secret/private.pem
+  public-key-path: classpath:secret/public.pem
+  access-token-validity: 1800000
+  refresh-token-validity: 604800000
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_URL}

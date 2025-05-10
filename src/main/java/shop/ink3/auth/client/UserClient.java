@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import shop.ink3.auth.client.dto.AuthResponse;
 import shop.ink3.auth.client.dto.CommonResponse;
 
-@FeignClient(name = "user-api")
+@FeignClient(name = "shop-service")
 public interface UserClient {
     @RequestMapping(method = RequestMethod.GET, value = "/users/auth/{loginId}")
     CommonResponse<AuthResponse> getUser(@PathVariable String loginId);
