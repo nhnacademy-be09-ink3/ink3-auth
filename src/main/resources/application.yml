@@ -21,8 +21,6 @@ management:
         include: health,info
   health:
     show-details: always
-    eureka:
-      enabled: false
     redis:
       enabled: false
 
