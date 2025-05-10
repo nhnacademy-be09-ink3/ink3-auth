@@ -59,6 +59,8 @@ jobs:
           java-version: 21
 
       - name: SonarQube Scan
+        env:
+          EUREKA_URL: ${{ secrets.EUREKA_URL }}
         run: |
           mvn verify sonar:sonar \
             -Dsonar.projectKey=ink3_auth_server \
@@ -106,6 +108,8 @@ jobs:
         run: mvn package -DskipTests=true -B
 
       - name: Run application in background
+        env:
+          EUREKA_URL: ${{ secrets.EUREKA_URL }}
         run: |
           nohup java -jar target/ink3-auth-${{ steps.extract_version.outputs.version }}.jar --server.port=10256 > app.log 2>&1 &
           echo $! > app.pid
@@ -123,6 +127,8 @@ jobs:
         run: kill $(cat app.pid)
 
       - name: Run unit tests
+        env:
+          EUREKA_URL: ${{ secrets.EUREKA_URL }}
         run: mvn test -B
 
       - name: Print app log if health check fails
@@ -179,5 +185,6 @@ jobs:
           script: |
             cd ~/ink3-server/auth
             chmod +x deploy.sh
+            export EUREKA_URL=${{ secrets.EUREKA_URL }}
             nohup ./deploy.sh "${{ steps.extract_version.outputs.version }}" > deploy.log 2>&1 &
             exit 0
