@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Ink3-AUTH
+    name: auth-service
 
 server:
   port: 10256
