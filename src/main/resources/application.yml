@@ -23,4 +23,3 @@ management:
     show-details: always
     redis:
       enabled: false
-
