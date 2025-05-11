@@ -38,13 +38,13 @@ jobs:
           echo "-----BEGIN PRIVATE KEY-----" > secret/private.pem
           echo "FAKE-KEY-DATA" >> secret/private.pem
           echo "-----END PRIVATE KEY-----" >> secret/private.pem
-
+          
           echo "-----BEGIN PUBLIC KEY-----" > secret/public.pem
           echo "FAKE-KEY-DATA" >> secret/public.pem
           echo "-----END PUBLIC KEY-----" >> secret/public.pem
-
-          echo "JWT_PRIVATE_KEY_PATH=secret/private.pem" >> $GITHUB_ENV
-          echo "JWT_PUBLIC_KEY_PATH=secret/public.pem" >> $GITHUB_ENV
+          
+          echo "JWT_PRIVATE_KEY_PATH=$PWD/secret/private.pem" >> $GITHUB_ENV
+          echo "JWT_PUBLIC_KEY_PATH=$PWD/secret/public.pem" >> $GITHUB_ENV
 
       - name: Cache Maven packages
         uses: actions/cache@v3
