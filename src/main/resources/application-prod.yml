@@ -5,17 +5,24 @@ spring:
       port: 6379
       database: 295
       password: ${REDIS_PASSWORD}
-server:
-  port: 8081
 jwt:
-  private-key-path: classpath:secret/private.pem
-  public-key-path: classpath:secret/public.pem
+  private-key-path: ${JWT_PRIVATE_KEY_PATH}
+  public-key-path: ${JWT_PUBLIC_KEY_PATH}
   access-token-validity: 1800000
   refresh-token-validity: 604800000
-
 eureka:
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
       defaultZone: ${EUREKA_URL}
+  instance:
+    prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

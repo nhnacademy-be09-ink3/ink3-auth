@@ -14,8 +14,8 @@ spring:
 server:
   port: 8081
 jwt:
-  private-key-path: classpath:secret/private.pem
-  public-key-path: classpath:secret/public.pem
+  private-key-path: file:secret/private.pem
+  public-key-path: file:secret/public.pem
   access-token-validity: 1800000
   refresh-token-validity: 604800000
 
@@ -24,4 +24,4 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://admin:1234@localhost:10252/eureka/
+      defaultZone: http://admin:1234@127.0.0.1:10252/eureka/

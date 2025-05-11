@@ -1,24 +1,26 @@
 package shop.ink3.auth.config;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
+@RequiredArgsConstructor
 @Configuration
 public class JwtKeyConfig {
+    private final ResourceLoader resourceLoader;
+
     @Value("${jwt.private-key-path}")
     private String privateKeyPath;
 
@@ -47,17 +49,10 @@ public class JwtKeyConfig {
         return KeyFactory.getInstance("RSA").generatePublic(keySpec);
     }
 
-    public String readKey(String keyPath) throws IOException {
-        if (keyPath.startsWith("classpath:")) {
-            String pathInClasspath = keyPath.replace("classpath:", "");
-            try (InputStream is = getClass().getClassLoader().getResourceAsStream(pathInClasspath)) {
-                if (Objects.isNull(is)) {
-                    throw new FileNotFoundException("Cannot find classpath resource: " + pathInClasspath);
-                }
-                return new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            }
-        } else {
-            return Files.readString(Paths.get(keyPath));
+    public String readKey(String path) throws IOException {
+        Resource resource = resourceLoader.getResource(path);
+        try (InputStream is = resource.getInputStream()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 }
