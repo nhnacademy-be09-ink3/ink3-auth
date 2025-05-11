@@ -58,6 +58,17 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Generate dummy JWT keys for test
+        run: |
+          mkdir -p secret
+          echo "-----BEGIN PRIVATE KEY-----" > secret/private.pem
+          echo "MIIBVA..." >> secret/private.pem
+          echo "-----END PRIVATE KEY-----" >> secret/private.pem
+
+          echo "-----BEGIN PUBLIC KEY-----" > secret/public.pem
+          echo "MFwwDQ..." >> secret/public.pem
+          echo "-----END PUBLIC KEY-----" >> secret/public.pem
+
       - name: SonarQube Scan
         env:
           EUREKA_URL: ${{ secrets.EUREKA_URL }}
@@ -94,6 +105,17 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      - name: Generate dummy JWT keys for test
+        run: |
+          mkdir -p secret
+          echo "-----BEGIN PRIVATE KEY-----" > secret/private.pem
+          echo "MIIBVA..." >> secret/private.pem
+          echo "-----END PRIVATE KEY-----" >> secret/private.pem
+          
+          echo "-----BEGIN PUBLIC KEY-----" > secret/public.pem
+          echo "MFwwDQ..." >> secret/public.pem
+          echo "-----END PUBLIC KEY-----" >> secret/public.pem
 
       - name: Extract version from POM
         id: extract_version
@@ -175,6 +197,21 @@ jobs:
           source: "target/*.jar"
           target: "~/ink3-server/auth"
 
+      - name: Write key files
+        run: |
+          echo "${{ secrets.JWT_PRIVATE_KEY }}" > private.pem
+          echo "${{ secrets.JWT_PUBLIC_KEY }}" > public.pem
+
+      - name: Send keys to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_IP }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_ID }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "private.pem,public.pem"
+          target: "~/ink3-server/auth/secret"
+
       - name: Run deploy.sh on server
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -186,5 +223,7 @@ jobs:
             cd ~/ink3-server/auth
             chmod +x deploy.sh
             export EUREKA_URL=${{ secrets.EUREKA_URL }}
+            export JWT_PRIVATE_KEY_PATH=${{ secrets.JWT_PRIVATE_KEY_PATH }}
+            export JWT_PUBLIC_KEY_PATH=${{ secrets.JWT_PUBLIC_KEY_PATH }}
             nohup ./deploy.sh "${{ steps.extract_version.outputs.version }}" > deploy.log 2>&1 &
             exit 0

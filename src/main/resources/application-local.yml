@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          user-api:
+            url: http://localhost:8080
+  data:
+    redis:
+      host: s4.java21.net
+      port: 6379
+      database: 295
+      password: "*N2vya7H@muDTwdNMR!"
+server:
+  port: 8081
+jwt:
+  private-key-path: file:secret/private.pem
+  public-key-path: file:secret/public.pem
+  access-token-validity: 1800000
+  refresh-token-validity: 604800000
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://admin:1234@127.0.0.1:10252/eureka/
