@@ -55,9 +55,7 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Build with coverage
-        run: mvn clean verify -B \
-          -DJWT_PRIVATE_KEY_PATH=secret/private.pem \
-          -DJWT_PUBLIC_KEY_PATH=secret/public.pem
+        run: mvn clean verify -B -DJWT_PRIVATE_KEY_PATH=secret/private.pem -DJWT_PUBLIC_KEY_PATH=secret/public.pem
 
   sonar-analysis:
     name: SonarQube Analysis
