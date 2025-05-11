@@ -170,7 +170,7 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           source: "*.jar,private.pem,public.pem"
-          target: "~/ink3-server/auth/"
+          target: "~/ink3-server/auth/target"
 
       - name: Run deploy script
         uses: appleboy/ssh-action@v0.1.7
