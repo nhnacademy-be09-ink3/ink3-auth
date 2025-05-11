@@ -98,7 +98,7 @@ jobs:
 
       - name: Run app
         run: |
-          nohup java -jar target/*.jar --server.port=8080 --spring.profiles.active=test > app.log 2>&1 &
+          nohup java -jar app-jar/*.jar --server.port=8080 --spring.profiles.active=test > app.log 2>&1 &
           echo $! > app.pid
 
       - name: Wait and health check
@@ -150,7 +150,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
-          source: "target/*.jar,private.pem,public.pem"
+          source: "app-jar/*.jar,private.pem,public.pem"
           target: "~/ink3-server/auth/"
 
       - name: Run deploy script
