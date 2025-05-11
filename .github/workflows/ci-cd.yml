@@ -114,8 +114,16 @@ jobs:
 
       - name: Wait and health check
         run: |
-          sleep 10
-          curl --fail http://localhost:8080/actuator/health
+          for i in {1..10}; do
+            echo "⏳ Waiting for server to start... attempt $i"
+            if curl --fail http://localhost:8080/actuator/health; then
+              echo "✅ Server is UP!"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Server failed to start in time"
+          exit 1
 
       - name: Run unit tests
         run: mvn test -B -Dspring.profiles.active=test
