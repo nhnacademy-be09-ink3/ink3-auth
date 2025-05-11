@@ -185,6 +185,6 @@ jobs:
             export EUREKA_URL=${{ secrets.EUREKA_URL }}
             export JWT_PRIVATE_KEY_PATH=${{ secrets.JWT_PRIVATE_KEY_PATH }}
             export JWT_PUBLIC_KEY_PATH=${{ secrets.JWT_PUBLIC_KEY_PATH }}
-            export JWT_PUBLIC_KEY_PATH=${{ secrets.REDIS_PASSWORD }}
+            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             nohup ./deploy.sh "${{ steps.extract_version.outputs.version }}" > deploy.log 2>&1 &
             exit 0
