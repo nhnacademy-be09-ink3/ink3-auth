@@ -30,9 +30,10 @@ jobs:
 
       - name: Generate dummy JWT keys
         run: |
-          mkdir -p secret
-          echo "-----BEGIN PRIVATE KEY-----\nFAKEKEY" > secret/private.pem
-          echo "-----BEGIN PUBLIC KEY-----\nFAKEKEY" > secret/public.pem
+          mkdir -p src/test/resources/secret
+          echo "-----BEGIN PRIVATE KEY-----\nFAKE" > src/test/resources/secret/private.pem
+          echo "-----BEGIN PUBLIC KEY-----\nFAKE" > src/test/resources/secret/public.pem
+
 
       - name: Build with coverage
         run: mvn clean verify -B -Dspring.profiles.active=test

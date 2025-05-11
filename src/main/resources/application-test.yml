@@ -2,7 +2,7 @@ eureka:
   client:
     enabled: false
 jwt:
-  private-key-path: file:secret/private.pem
-  public-key-path: file:secret/public.pem
+  private-key-path: classpath:secret/private.pem
+  public-key-path: classpath:secret/public.pem
   access-token-validity: 1800000
   refresh-token-validity: 604800000
