@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   pull_request:
-    branches: [main]
+    branches: [dev]
 
 jobs:
   build:
@@ -72,10 +72,10 @@ jobs:
           TOTAL=$((LINE_COVERAGE + LINE_MISSED))
           PERCENT=$((LINE_COVERAGE * 100 / TOTAL))
           echo "Coverage: $PERCENT%"
-#          if [ "$PERCENT" -lt 60 ]; then
-#            echo "Coverage is below 60%! Failing build."
-#            exit 1
-#          fi
+  #          if [ "$PERCENT" -lt 60 ]; then
+  #            echo "Coverage is below 60%! Failing build."
+  #            exit 1
+  #          fi
 
   test:
     name: Run app + health check
@@ -109,14 +109,14 @@ jobs:
 
       - name: Run app
         run: |
-          nohup java -jar *.jar --server.port=8080 --spring.profiles.active=test > app.log 2>&1 &
+          nohup java -jar *.jar --server.port=10268 --spring.profiles.active=test > app.log 2>&1 &
           echo $! > app.pid
 
       - name: Wait and health check
         run: |
           for i in {1..10}; do
             echo "⏳ Waiting for server to start... attempt $i"
-            if curl --fail http://localhost:8080/actuator/health; then
+            if curl --fail http://localhost:10268/actuator/health; then
               echo "✅ Server is up"
               exit 0
             fi
@@ -170,7 +170,7 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           source: "*.jar,private.pem,public.pem"
-          target: "~/ink3-server/auth/target"
+          target: "~/ink3-server-dev/auth-dev/target"
 
       - name: Run deploy script
         uses: appleboy/ssh-action@v0.1.7
@@ -180,7 +180,7 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/ink3-server/auth
+            cd ~/ink3-server-dev/auth-dev
             chmod +x deploy.sh
             export EUREKA_URL=${{ secrets.EUREKA_URL }}
             export JWT_PRIVATE_KEY_PATH=${{ secrets.JWT_PRIVATE_KEY_PATH }}
