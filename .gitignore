@@ -34,5 +34,3 @@ build/
 
 ### Secret ###
 src/main/resources/application-local.yml
-private.pem
-public.pem
