@@ -182,7 +182,7 @@ jobs:
           script: |
             cd ~/ink3-server-dev/auth-dev
             chmod +x deploy.sh
-            export EUREKA_URL=${{ secrets.EUREKA_URL }}
+            export EUREKA_URL=${{ secrets.DEV_EUREKA_URL }}
             export JWT_PRIVATE_KEY_PATH=${{ secrets.JWT_PRIVATE_KEY_PATH }}
             export JWT_PUBLIC_KEY_PATH=${{ secrets.JWT_PUBLIC_KEY_PATH }}
             export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
