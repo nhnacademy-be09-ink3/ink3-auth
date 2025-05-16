@@ -115,7 +115,7 @@ jobs:
         run: |
           for i in {1..10}; do
             echo "⏳ Waiting for server to start... attempt $i"
-            if curl --fail http://localhost:8080/actuator/health; then
+            if curl --fail http://localhost:8080/auth/actuator/health; then
               echo "✅ Server is up"
               exit 0
             fi
