@@ -108,14 +108,14 @@ jobs:
 
       - name: Run app
         run: |
-          nohup java -jar *.jar --server.port=10268 --spring.profiles.active=test > app.log 2>&1 &
+          nohup java -jar *.jar --server.port=8080 --spring.profiles.active=test > app.log 2>&1 &
           echo $! > app.pid
 
       - name: Wait and health check
         run: |
           for i in {1..10}; do
             echo "⏳ Waiting for server to start... attempt $i"
-            if curl --fail http://localhost:10268/actuator/health; then
+            if curl --fail http://localhost:8080/auth/actuator/health; then
               echo "✅ Server is up"
               exit 0
             fi
