@@ -11,6 +11,7 @@ import shop.ink3.auth.client.UserClient;
 import shop.ink3.auth.client.dto.AuthResponse;
 import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.dto.LoginRequest;
+import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.ReissueRequest;
 import shop.ink3.auth.dto.UserType;
 import shop.ink3.auth.exception.InvalidPasswordException;
@@ -26,7 +27,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenRepository tokenRepository;
 
-    public shop.ink3.auth.dto.AuthResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         CustomUserDetails userDetails = (CustomUserDetails) loadUserByUsername(request.username(), request.type());
 
         if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
@@ -43,7 +44,7 @@ public class AuthService {
         return issueTokens(userDetails, request.type());
     }
 
-    public shop.ink3.auth.dto.AuthResponse reissue(ReissueRequest request) {
+    public LoginResponse reissue(ReissueRequest request) {
         String savedRefreshToken = tokenRepository.getRefreshToken(request.id(), request.type());
 
         if (Objects.isNull(savedRefreshToken) || !savedRefreshToken.equals(request.refreshToken())) {
@@ -60,9 +61,7 @@ public class AuthService {
     public void logout(String accessToken) {
         Claims claims = jwtTokenProvider.parseToken(accessToken);
         long id = claims.get("id", Long.class);
-        UserType type = UserType.valueOf(
-                claims.get("role", String.class).toUpperCase().replace("ROLE_", "")
-        );
+        UserType type = UserType.valueOf(claims.get("role", String.class).toUpperCase());
         tokenRepository.saveAccessTokenToBlackList(accessToken);
         tokenRepository.deleteRefreshToken(id, type);
     }
@@ -72,7 +71,7 @@ public class AuthService {
         return new CustomUserDetails(response.data().id(), response.data().username(), response.data().password(), type.name());
     }
 
-    private shop.ink3.auth.dto.AuthResponse issueTokens(CustomUserDetails userDetails, UserType type) {
+    private LoginResponse issueTokens(CustomUserDetails userDetails, UserType type) {
         String accessToken = jwtTokenProvider.generateAccessToken(
                 userDetails.getId(),
                 userDetails.getUsername(),
@@ -83,6 +82,6 @@ public class AuthService {
         );
 
         tokenRepository.saveRefreshToken(userDetails.getId(), type, refreshToken);
-        return new shop.ink3.auth.dto.AuthResponse(accessToken, refreshToken);
+        return new LoginResponse(accessToken, refreshToken);
     }
 }

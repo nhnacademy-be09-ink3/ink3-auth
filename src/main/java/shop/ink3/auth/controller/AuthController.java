@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import shop.ink3.auth.client.dto.CommonResponse;
-import shop.ink3.auth.dto.AuthResponse;
 import shop.ink3.auth.dto.LoginRequest;
+import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.LogoutRequest;
 import shop.ink3.auth.dto.PublicKeyResponse;
 import shop.ink3.auth.dto.ReissueRequest;
@@ -28,14 +28,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+    public ResponseEntity<CommonResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<CommonResponse<AuthResponse>> reissue(@RequestBody ReissueRequest request) {
-        AuthResponse response = authService.reissue(request);
+    public ResponseEntity<CommonResponse<LoginResponse>> reissue(@RequestBody ReissueRequest request) {
+        LoginResponse response = authService.reissue(request);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 

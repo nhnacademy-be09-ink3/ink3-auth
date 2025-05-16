@@ -3,7 +3,7 @@ spring:
     redis:
       host: s4.java21.net
       port: 6379
-      database: 295
+      database: 296
       password: ${REDIS_PASSWORD}
 jwt:
   private-key-path: ${JWT_PRIVATE_KEY_PATH}

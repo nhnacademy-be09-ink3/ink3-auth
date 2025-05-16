@@ -10,15 +10,18 @@ import shop.ink3.auth.client.dto.CommonResponse;
 
 @FeignClient(name = "shop-service")
 public interface UserClient {
-    @RequestMapping(method = RequestMethod.GET, value = "/users/auth/{loginId}")
+    @RequestMapping(method = RequestMethod.GET, value = "/shop/users/auth/{loginId}")
     CommonResponse<AuthResponse> getUser(@PathVariable String loginId);
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/users/{userId}/last-login")
+    @RequestMapping(method = RequestMethod.GET, value = "/shop/users/auth/social/{provider}/{providerUserId}")
+    CommonResponse<AuthResponse> getSocialUser(@PathVariable String provider, @PathVariable String providerUserId);
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/shop/users/{userId}/last-login")
     ResponseEntity<Void> updateUserLastLogin(@PathVariable long userId);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/admins/auth/{loginId}")
+    @RequestMapping(method = RequestMethod.GET, value = "/shop/admins/auth/{loginId}")
     CommonResponse<AuthResponse> getAdmin(@PathVariable String loginId);
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/admins/{adminId}/last-login")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/shop/admins/{adminId}/last-login")
     ResponseEntity<Void> updateAdminLastLogin(@PathVariable long adminId);
 }
