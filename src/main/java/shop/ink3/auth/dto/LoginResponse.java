@@ -1,6 +1,6 @@
 package shop.ink3.auth.dto;
 
-public record AuthResponse(
+public record LoginResponse(
         String accessToken,
         String refreshToken
 ) {

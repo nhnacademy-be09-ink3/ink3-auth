@@ -5,3 +5,6 @@ spring:
     openfeign:
       okhttp:
         enabled: true
+server:
+  servlet:
+    context-path: /auth
