@@ -14,12 +14,14 @@ import shop.ink3.auth.dto.LogoutRequest;
 import shop.ink3.auth.dto.PublicKeyResponse;
 import shop.ink3.auth.dto.ReissueRequest;
 import shop.ink3.auth.service.AuthService;
+import shop.ink3.auth.service.TokenService;
 import shop.ink3.auth.util.KeyUtils;
 
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
     private final AuthService authService;
+    private final TokenService tokenService;
     private final PublicKey publicKey;
 
     @GetMapping("/public-key")
@@ -35,13 +37,13 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<CommonResponse<LoginResponse>> reissue(@RequestBody ReissueRequest request) {
-        LoginResponse response = authService.reissue(request);
+        LoginResponse response = tokenService.reissueTokens(request);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
         authService.logout(request.accessToken());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

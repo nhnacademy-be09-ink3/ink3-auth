@@ -9,6 +9,8 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import shop.ink3.auth.dto.JwtToken;
+import shop.ink3.auth.dto.UserRole;
 
 @Component
 @RequiredArgsConstructor
@@ -22,33 +24,37 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
 
-    public String generateAccessToken(long id, String username, String role) {
+    public JwtToken generateAccessToken(long id, String username, UserRole role) {
         Date now = new Date();
-        return Jwts.builder()
+        Date expiry = new Date(now.getTime() + accessTokenValidity);
+        String token = Jwts.builder()
                 .subject(username)
                 .claim("id", id)
-                .claim("role", role)
+                .claim("role", role.name())
                 .issuedAt(now)
-                .expiration(new Date(now.getTime() + accessTokenValidity))
+                .expiration(expiry)
                 .signWith(privateKey, SIG.RS256)
                 .compact();
+        return new JwtToken(token, expiry.getTime());
     }
 
-    public String generateRefreshToken(String username) {
+    public JwtToken generateRefreshToken(String username) {
         Date now = new Date();
-        return Jwts.builder()
+        Date expiry = new Date(now.getTime() + refreshTokenValidity);
+        String token = Jwts.builder()
                 .subject(username)
                 .issuedAt(now)
-                .expiration(new Date(now.getTime() + refreshTokenValidity))
+                .expiration(expiry)
                 .signWith(privateKey, SIG.RS256)
                 .compact();
+        return new JwtToken(token, expiry.getTime());
     }
 
-    public Claims parseToken(String refreshToken) {
+    public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(publicKey)
                 .build()
-                .parseSignedClaims(refreshToken)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 }

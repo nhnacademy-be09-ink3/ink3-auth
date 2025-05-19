@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import shop.ink3.auth.dto.UserType;
+import shop.ink3.auth.dto.UserRole;
 
 @RequiredArgsConstructor
 @Repository
@@ -18,15 +18,15 @@ public class TokenRepository {
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
 
-    public String getRefreshToken(long id, UserType userType) {
-        if (userType == UserType.ADMIN) {
+    public String getRefreshToken(long id, UserRole userRole) {
+        if (userRole == UserRole.ADMIN) {
             return redisTemplate.opsForValue().get("refresh:admin:" + id);
         }
         return redisTemplate.opsForValue().get("refresh:user:" + id);
     }
 
-    public void saveRefreshToken(long id, UserType userType, String refreshToken) {
-        if (userType == UserType.ADMIN) {
+    public void saveRefreshToken(long id, UserRole userRole, String refreshToken) {
+        if (userRole == UserRole.ADMIN) {
             redisTemplate.opsForValue().set("refresh:admin:" + id, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
         } else {
             redisTemplate.opsForValue().set("refresh:user:" + id, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
@@ -37,8 +37,8 @@ public class TokenRepository {
         redisTemplate.opsForValue().set("blacklist:" + accessToken, "blocked", accessTokenValidity, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshToken(long id, UserType userType) {
-        if (userType == UserType.ADMIN) {
+    public void deleteRefreshToken(long id, UserRole userRole) {
+        if (userRole == UserRole.ADMIN) {
             redisTemplate.delete("refresh:admin:" + id);
         } else {
             redisTemplate.delete("refresh:user:" + id);

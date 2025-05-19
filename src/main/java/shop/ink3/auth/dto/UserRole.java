@@ -1,6 +1,6 @@
 package shop.ink3.auth.dto;
 
-public enum UserType {
+public enum UserRole {
     ADMIN,
     USER
 }
