@@ -19,7 +19,7 @@ public class TokenRepository {
     private long refreshTokenValidity;
 
     private static final String USER_REFRESH_TOKEN_KEY = "refresh:user:";
-    private static final String ADMIN_REFRESH_TOKEN_KEY = "refresh:user:";
+    private static final String ADMIN_REFRESH_TOKEN_KEY = "refresh:admin:";
     private static final String BLACKLIST_KEY = "blacklist:";
 
     public String getRefreshToken(long id, UserRole userRole) {
