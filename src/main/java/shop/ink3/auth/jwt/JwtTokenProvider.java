@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import shop.ink3.auth.dto.JwtToken;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 
 @Component
 @RequiredArgsConstructor
@@ -24,13 +24,13 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
 
-    public JwtToken generateAccessToken(long id, String username, UserRole role) {
+    public JwtToken generateAccessToken(long id, String username, UserType userType) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidity);
         String token = Jwts.builder()
                 .subject(username)
                 .claim("id", id)
-                .claim("role", role.name())
+                .claim("userType", userType.name())
                 .claim("tokenType", "access")
                 .issuedAt(now)
                 .expiration(expiry)
@@ -39,13 +39,13 @@ public class JwtTokenProvider {
         return new JwtToken(token, expiry.getTime());
     }
 
-    public JwtToken generateRefreshToken(long id, String username, UserRole role) {
+    public JwtToken generateRefreshToken(long id, String username, UserType userType) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenValidity);
         String token = Jwts.builder()
                 .subject(username)
                 .claim("id", id)
-                .claim("role", role.name())
+                .claim("userType", userType.name())
                 .claim("tokenType", "refresh")
                 .issuedAt(now)
                 .expiration(expiry)

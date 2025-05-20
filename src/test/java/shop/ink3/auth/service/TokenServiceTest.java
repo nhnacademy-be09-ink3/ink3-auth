@@ -21,7 +21,7 @@ import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.dto.JwtToken;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.ReissueRequest;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
 import shop.ink3.auth.jwt.JwtTokenProvider;
 import shop.ink3.auth.repository.TokenRepository;
@@ -46,23 +46,23 @@ class TokenServiceTest {
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
-        when(jwtTokenProvider.generateAccessToken(1L, "username", UserRole.USER)).thenReturn(accessToken);
-        when(jwtTokenProvider.generateRefreshToken(1L, "username", UserRole.USER)).thenReturn(refreshToken);
+        when(jwtTokenProvider.generateAccessToken(1L, "username", UserType.USER)).thenReturn(accessToken);
+        when(jwtTokenProvider.generateRefreshToken(1L, "username", UserType.USER)).thenReturn(refreshToken);
 
-        LoginResponse response = tokenService.issueTokens(user, UserRole.USER);
+        LoginResponse response = tokenService.issueTokens(user, UserType.USER);
 
         assertThat(response.accessToken().token()).isEqualTo("accessToken");
         assertThat(response.accessToken().expiresAt()).isEqualTo(accessToken.expiresAt());
         assertThat(response.refreshToken().token()).isEqualTo("refreshToken");
         assertThat(response.refreshToken().expiresAt()).isEqualTo(refreshToken.expiresAt());
 
-        verify(tokenRepository).saveRefreshToken(1L, UserRole.USER, "refreshToken");
+        verify(tokenRepository).saveRefreshToken(1L, UserType.USER, "refreshToken");
     }
 
     @Test
     void reissueTokens() {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "refreshToken");
-        when(tokenRepository.getRefreshToken(1L, UserRole.USER)).thenReturn("refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "refreshToken");
+        when(tokenRepository.getRefreshToken(1L, UserType.USER)).thenReturn("refreshToken");
         Claims claims = mock(Claims.class);
         when(jwtTokenProvider.parseToken("refreshToken")).thenReturn(claims);
         when(claims.getSubject()).thenReturn("username");
@@ -85,16 +85,16 @@ class TokenServiceTest {
 
     @Test
     void reissueTokensWithInvalidRefreshToken() {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "invalidRefreshToken");
-        when(tokenRepository.getRefreshToken(1L, UserRole.USER)).thenReturn("refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "invalidRefreshToken");
+        when(tokenRepository.getRefreshToken(1L, UserType.USER)).thenReturn("refreshToken");
 
         assertThatThrownBy(() -> tokenService.reissueTokens(request)).isInstanceOf(InvalidRefreshTokenException.class);
     }
 
     @Test
     void reissueTokensWithSavedRefreshTokenNotFound() {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "invalidRefreshToken");
-        when(tokenRepository.getRefreshToken(1L, UserRole.USER)).thenReturn(null);
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "invalidRefreshToken");
+        when(tokenRepository.getRefreshToken(1L, UserType.USER)).thenReturn(null);
 
         assertThatThrownBy(() -> tokenService.reissueTokens(request)).isInstanceOf(InvalidRefreshTokenException.class);
     }
@@ -104,11 +104,11 @@ class TokenServiceTest {
         Claims claims = mock(Claims.class);
         when(jwtTokenProvider.parseToken("accessToken")).thenReturn(claims);
         when(claims.get("id", Long.class)).thenReturn(1L);
-        when(claims.get("role", String.class)).thenReturn("USER");
+        when(claims.get("userType", String.class)).thenReturn("USER");
 
         tokenService.invalidateTokens("accessToken");
 
         verify(tokenRepository).saveAccessTokenToBlackList("accessToken");
-        verify(tokenRepository).deleteRefreshToken(1L, UserRole.USER);
+        verify(tokenRepository).deleteRefreshToken(1L, UserType.USER);
     }
 }

@@ -17,7 +17,7 @@ import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.dto.JwtToken;
 import shop.ink3.auth.dto.LoginRequest;
 import shop.ink3.auth.dto.LoginResponse;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 import shop.ink3.auth.exception.InvalidPasswordException;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,14 +36,14 @@ class AuthServiceTest {
 
     @Test
     void loginUser() {
-        LoginRequest request = new LoginRequest("test", "test", UserRole.USER);
+        LoginRequest request = new LoginRequest("test", "test", UserType.USER);
         AuthResponse user = new AuthResponse(1L, "test", "encodedPassword");
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(userClient.getUser("test")).thenReturn(CommonResponse.success(user));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(user, UserRole.USER)).thenReturn(new LoginResponse(accessToken, refreshToken));
+        when(tokenService.issueTokens(user, UserType.USER)).thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
 
@@ -54,14 +54,14 @@ class AuthServiceTest {
 
     @Test
     void loginAdmin() {
-        LoginRequest request = new LoginRequest("test", "test", UserRole.ADMIN);
+        LoginRequest request = new LoginRequest("test", "test", UserType.ADMIN);
         AuthResponse admin = new AuthResponse(1L, "test", "encodedPassword");
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(userClient.getAdmin("test")).thenReturn(CommonResponse.success(admin));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(admin, UserRole.ADMIN)).thenReturn(new LoginResponse(accessToken, refreshToken));
+        when(tokenService.issueTokens(admin, UserType.ADMIN)).thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
 
@@ -72,7 +72,7 @@ class AuthServiceTest {
 
     @Test
     void loginWithInvalidPassword() {
-        LoginRequest request = new LoginRequest("test", "invalidPassword", UserRole.USER);
+        LoginRequest request = new LoginRequest("test", "invalidPassword", UserType.USER);
         AuthResponse user = new AuthResponse(1L, "test", "encodedPassword");
 
         when(userClient.getUser("test")).thenReturn(CommonResponse.success(user));

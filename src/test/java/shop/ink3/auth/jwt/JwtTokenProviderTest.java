@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shop.ink3.auth.dto.JwtToken;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 
 @ExtendWith(MockitoExtension.class)
 class JwtTokenProviderTest {
@@ -41,22 +41,22 @@ class JwtTokenProviderTest {
 
     @Test
     void generateAccessToken() {
-        JwtToken jwtToken = jwtTokenProvider.generateAccessToken(1L, "test", UserRole.USER);
+        JwtToken jwtToken = jwtTokenProvider.generateAccessToken(1L, "test", UserType.USER);
         Claims claims = jwtTokenProvider.parseToken(jwtToken.token());
         assertThat(claims.getSubject()).isEqualTo("test");
         assertThat(claims.get("id", Long.class)).isEqualTo(1L);
-        assertThat(claims.get("role", String.class)).isEqualTo("USER");
+        assertThat(claims.get("userType", String.class)).isEqualTo("USER");
         assertThat(claims.get("tokenType", String.class)).isEqualTo("access");
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }
 
     @Test
     void generateRefreshToken() {
-        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken(1L, "test", UserRole.USER);
+        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken(1L, "test", UserType.USER);
         Claims claims = jwtTokenProvider.parseToken(jwtToken.token());
         assertThat(claims.getSubject()).isEqualTo("test");
         assertThat(claims.get("id", Long.class)).isEqualTo(1L);
-        assertThat(claims.get("role", String.class)).isEqualTo("USER");
+        assertThat(claims.get("userType", String.class)).isEqualTo("USER");
         assertThat(claims.get("tokenType", String.class)).isEqualTo("refresh");
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }

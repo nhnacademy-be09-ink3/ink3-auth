@@ -28,7 +28,7 @@ import shop.ink3.auth.dto.LoginRequest;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.LogoutRequest;
 import shop.ink3.auth.dto.ReissueRequest;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 import shop.ink3.auth.exception.DormantException;
 import shop.ink3.auth.exception.InvalidPasswordException;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
@@ -79,7 +79,7 @@ class AuthControllerTest {
 
     @Test
     void login() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserRole.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
         LoginResponse response = new LoginResponse(accessToken, refreshToken);
@@ -103,7 +103,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithInvalidPassword() throws Exception {
-        LoginRequest request = new LoginRequest("username", "invalidPassword", UserRole.USER);
+        LoginRequest request = new LoginRequest("username", "invalidPassword", UserType.USER);
         when(authService.login(request)).thenThrow(new InvalidPasswordException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +119,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithUserNotFound() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserRole.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
         when(authService.login(request)).thenThrow(new UserNotFoundException());
 
         mockMvc.perform(post("/login")
@@ -136,7 +136,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithDormantUser() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserRole.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
         when(authService.login(request)).thenThrow(new DormantException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +152,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithWithDrawnUser() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserRole.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
         when(authService.login(request)).thenThrow(new WithdrawnException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +168,7 @@ class AuthControllerTest {
 
     @Test
     void reissue() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "refreshToken");
         JwtToken newAccessToken = new JwtToken("newAccessToken", 1L);
         JwtToken newRefreshToken = new JwtToken("newRefreshToken", 2L);
         LoginResponse response = new LoginResponse(newAccessToken, newRefreshToken);
@@ -191,12 +191,12 @@ class AuthControllerTest {
 
     @Test
     void reissueWithInvalidToken() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "InvalidRefreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "InvalidRefreshToken");
         when(tokenService.reissueTokens(request)).thenThrow(new InvalidRefreshTokenException());
 
         mockMvc.perform(post("/reissue")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
@@ -208,7 +208,7 @@ class AuthControllerTest {
 
     @Test
     void reissueWithExpiredToken() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "InvalidRefreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "InvalidRefreshToken");
         when(tokenService.reissueTokens(request)).thenThrow(new ExpiredJwtException(null, null, "Token expired."));
 
         mockMvc.perform(post("/reissue")
@@ -225,7 +225,7 @@ class AuthControllerTest {
 
     @Test
     void reissueWithUserNotFound() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "refreshToken");
         when(tokenService.reissueTokens(request)).thenThrow(new UserNotFoundException());
         mockMvc.perform(post("/reissue")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -241,7 +241,7 @@ class AuthControllerTest {
 
     @Test
     void reissueWithDormantUser() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "refreshToken");
         when(tokenService.reissueTokens(request)).thenThrow(new DormantException());
         mockMvc.perform(post("/reissue")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -257,7 +257,7 @@ class AuthControllerTest {
 
     @Test
     void reissueWithWithDrawnUser() throws Exception {
-        ReissueRequest request = new ReissueRequest(1L, UserRole.USER, "refreshToken");
+        ReissueRequest request = new ReissueRequest(1L, UserType.USER, "refreshToken");
         when(tokenService.reissueTokens(request)).thenThrow(new WithdrawnException());
         mockMvc.perform(post("/reissue")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -277,8 +277,8 @@ class AuthControllerTest {
         doNothing().when(authService).logout("accessToken");
 
         mockMvc.perform(post("/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }

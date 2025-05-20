@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import shop.ink3.auth.dto.UserRole;
+import shop.ink3.auth.dto.UserType;
 
 @ExtendWith(SpringExtension.class)
 class TokenRepositoryTest {
@@ -47,7 +47,7 @@ class TokenRepositoryTest {
     void getRefreshTokenForAdmin() {
         when(valueOps.get("refresh:admin:1")).thenReturn("adminToken");
 
-        String result = tokenRepository.getRefreshToken(1L, UserRole.ADMIN);
+        String result = tokenRepository.getRefreshToken(1L, UserType.ADMIN);
 
         Assertions.assertEquals("adminToken", result);
     }
@@ -56,20 +56,20 @@ class TokenRepositoryTest {
     void getRefreshTokenForUser() {
         when(valueOps.get("refresh:user:1")).thenReturn("userToken");
 
-        String result = tokenRepository.getRefreshToken(1L, UserRole.USER);
+        String result = tokenRepository.getRefreshToken(1L, UserType.USER);
 
         Assertions.assertEquals("userToken", result);
     }
 
     @Test
     void saveAdminRefreshToken() {
-        tokenRepository.saveRefreshToken(1L, UserRole.ADMIN, "adminToken");
+        tokenRepository.saveRefreshToken(1L, UserType.ADMIN, "adminToken");
         verify(valueOps).set("refresh:admin:1", "adminToken", refreshTokenValidity, TimeUnit.MILLISECONDS);
     }
 
     @Test
     void saveUserRefreshToken() {
-        tokenRepository.saveRefreshToken(1L, UserRole.USER, "userToken");
+        tokenRepository.saveRefreshToken(1L, UserType.USER, "userToken");
         verify(valueOps).set("refresh:user:1", "userToken", refreshTokenValidity, TimeUnit.MILLISECONDS);
     }
 
@@ -81,13 +81,13 @@ class TokenRepositoryTest {
 
     @Test
     void deleteAdminRefreshToken() {
-        tokenRepository.deleteRefreshToken(1L, UserRole.ADMIN);
+        tokenRepository.deleteRefreshToken(1L, UserType.ADMIN);
         verify(redisTemplate).delete("refresh:admin:1");
     }
 
     @Test
     void deleteUserRefreshToken() {
-        tokenRepository.deleteRefreshToken(1L, UserRole.USER);
+        tokenRepository.deleteRefreshToken(1L, UserType.USER);
         verify(redisTemplate).delete("refresh:user:1");
     }
 }
