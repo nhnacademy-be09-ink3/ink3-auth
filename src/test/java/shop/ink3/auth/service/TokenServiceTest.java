@@ -47,7 +47,7 @@ class TokenServiceTest {
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(jwtTokenProvider.generateAccessToken(1L, "username", UserRole.USER)).thenReturn(accessToken);
-        when(jwtTokenProvider.generateRefreshToken("username")).thenReturn(refreshToken);
+        when(jwtTokenProvider.generateRefreshToken(1L, "username", UserRole.USER)).thenReturn(refreshToken);
 
         LoginResponse response = tokenService.issueTokens(user, UserRole.USER);
 
@@ -70,8 +70,10 @@ class TokenServiceTest {
         AuthResponse user = new AuthResponse(1L, "username", "encodedPassword");
         when(userClient.getUser("username")).thenReturn(CommonResponse.success(user));
 
-        when(jwtTokenProvider.generateAccessToken(anyLong(), anyString(), any())).thenReturn(new JwtToken("newAccessToken", 1L));
-        when(jwtTokenProvider.generateRefreshToken(anyString())).thenReturn(new JwtToken("newRefreshToken", 2L));
+        when(jwtTokenProvider.generateAccessToken(anyLong(), anyString(), any()))
+                .thenReturn(new JwtToken("newAccessToken", 1L));
+        when(jwtTokenProvider.generateRefreshToken(anyLong(), anyString(), any()))
+                .thenReturn(new JwtToken("newRefreshToken", 2L));
 
         LoginResponse response = tokenService.reissueTokens(request);
 

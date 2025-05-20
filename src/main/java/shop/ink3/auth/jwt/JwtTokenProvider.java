@@ -31,6 +31,7 @@ public class JwtTokenProvider {
                 .subject(username)
                 .claim("id", id)
                 .claim("role", role.name())
+                .claim("tokenType", "access")
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(privateKey, SIG.RS256)
@@ -38,11 +39,14 @@ public class JwtTokenProvider {
         return new JwtToken(token, expiry.getTime());
     }
 
-    public JwtToken generateRefreshToken(String username) {
+    public JwtToken generateRefreshToken(long id, String username, UserRole role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenValidity);
         String token = Jwts.builder()
                 .subject(username)
+                .claim("id", id)
+                .claim("role", role.name())
+                .claim("tokenType", "refresh")
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(privateKey, SIG.RS256)

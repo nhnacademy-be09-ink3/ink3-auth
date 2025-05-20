@@ -46,14 +46,18 @@ class JwtTokenProviderTest {
         assertThat(claims.getSubject()).isEqualTo("test");
         assertThat(claims.get("id", Long.class)).isEqualTo(1L);
         assertThat(claims.get("role", String.class)).isEqualTo("USER");
+        assertThat(claims.get("tokenType", String.class)).isEqualTo("access");
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }
 
     @Test
     void generateRefreshToken() {
-        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken("test");
+        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken(1L, "test", UserRole.USER);
         Claims claims = jwtTokenProvider.parseToken(jwtToken.token());
         assertThat(claims.getSubject()).isEqualTo("test");
+        assertThat(claims.get("id", Long.class)).isEqualTo(1L);
+        assertThat(claims.get("role", String.class)).isEqualTo("USER");
+        assertThat(claims.get("tokenType", String.class)).isEqualTo("refresh");
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }
 

@@ -28,7 +28,9 @@ public class TokenService {
                 role
         );
         JwtToken refreshToken = jwtTokenProvider.generateRefreshToken(
-                user.username()
+                user.id(),
+                user.username(),
+                role
         );
 
         tokenRepository.saveRefreshToken(user.id(), role, refreshToken.token());
@@ -44,7 +46,8 @@ public class TokenService {
 
         String username = jwtTokenProvider.parseToken(request.refreshToken()).getSubject();
 
-        AuthResponse user = (request.role() == UserRole.ADMIN ? userClient.getAdmin(username) : userClient.getUser(username)).data();
+        AuthResponse user = (request.role() == UserRole.ADMIN ? userClient.getAdmin(username)
+                : userClient.getUser(username)).data();
 
         return issueTokens(user, request.role());
     }
