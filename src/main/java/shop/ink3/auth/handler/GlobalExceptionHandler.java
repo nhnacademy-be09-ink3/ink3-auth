@@ -2,6 +2,7 @@ package shop.ink3.auth.handler;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,7 @@ import shop.ink3.auth.exception.InvalidRefreshTokenException;
 import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ExpiredJwtException.class)
@@ -51,6 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponse<Void>> handleException(Exception e) {
+        log.error("Unexpected server error", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(CommonResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected server error occurred."));
     }

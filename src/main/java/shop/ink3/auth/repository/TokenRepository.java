@@ -18,30 +18,45 @@ public class TokenRepository {
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
 
+    private static final String USER_REFRESH_TOKEN_KEY = "refresh:user:";
+    private static final String ADMIN_REFRESH_TOKEN_KEY = "refresh:user:";
+    private static final String BLACKLIST_KEY = "blacklist:";
+
     public String getRefreshToken(long id, UserRole userRole) {
         if (userRole == UserRole.ADMIN) {
-            return redisTemplate.opsForValue().get("refresh:admin:" + id);
+            return redisTemplate.opsForValue().get(ADMIN_REFRESH_TOKEN_KEY + id);
         }
-        return redisTemplate.opsForValue().get("refresh:user:" + id);
+        return redisTemplate.opsForValue().get(USER_REFRESH_TOKEN_KEY + id);
     }
 
     public void saveRefreshToken(long id, UserRole userRole, String refreshToken) {
         if (userRole == UserRole.ADMIN) {
-            redisTemplate.opsForValue().set("refresh:admin:" + id, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
+            redisTemplate.opsForValue().set(
+                    ADMIN_REFRESH_TOKEN_KEY + id,
+                    refreshToken,
+                    refreshTokenValidity,
+                    TimeUnit.MILLISECONDS
+            );
         } else {
-            redisTemplate.opsForValue().set("refresh:user:" + id, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
+            redisTemplate.opsForValue().set(
+                    USER_REFRESH_TOKEN_KEY + id,
+                    refreshToken,
+                    refreshTokenValidity,
+                    TimeUnit.MILLISECONDS
+            );
         }
     }
 
     public void saveAccessTokenToBlackList(String accessToken) {
-        redisTemplate.opsForValue().set("blacklist:" + accessToken, "blocked", accessTokenValidity, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue()
+                .set(BLACKLIST_KEY + accessToken, "blocked", accessTokenValidity, TimeUnit.MILLISECONDS);
     }
 
     public void deleteRefreshToken(long id, UserRole userRole) {
         if (userRole == UserRole.ADMIN) {
-            redisTemplate.delete("refresh:admin:" + id);
+            redisTemplate.delete(ADMIN_REFRESH_TOKEN_KEY + id);
         } else {
-            redisTemplate.delete("refresh:user:" + id);
+            redisTemplate.delete(USER_REFRESH_TOKEN_KEY + id);
         }
     }
 }

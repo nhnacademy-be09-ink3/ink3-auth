@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -28,7 +30,7 @@ public class JwtKeyConfig {
     private String publicKeyPath;
 
     @Bean
-    public PrivateKey privateKey() throws Exception {
+    public PrivateKey privateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String key = readKey(privateKeyPath);
         key = key.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
@@ -39,7 +41,7 @@ public class JwtKeyConfig {
     }
 
     @Bean
-    public PublicKey publicKey() throws Exception {
+    public PublicKey publicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String key = readKey(publicKeyPath);
         key = key.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")

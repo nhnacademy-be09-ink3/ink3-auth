@@ -19,8 +19,9 @@ class KeyUtilsTest {
 
         String pem = KeyUtils.publicKeyToPem(publicKey);
 
-        assertThat(pem).startsWith("-----BEGIN PUBLIC KEY-----\n");
-        assertThat(pem).endsWith("-----END PUBLIC KEY-----");
+        assertThat(pem)
+                .startsWith("-----BEGIN PUBLIC KEY-----\n")
+                .endsWith("-----END PUBLIC KEY-----");
 
         String base64Body = pem
                 .replace("-----BEGIN PUBLIC KEY-----\n", "")
