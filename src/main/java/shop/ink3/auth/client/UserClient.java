@@ -9,7 +9,7 @@ import shop.ink3.auth.client.dto.AuthResponse;
 import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.dto.SocialUserResponse;
 
-@FeignClient(name = "shop-service", url = "https://ink3.shop/dev/gateway")
+@FeignClient(name = "shop-service")
 public interface UserClient {
     @GetMapping("/shop/users/{loginId}/auth")
     CommonResponse<AuthResponse> getUser(@PathVariable String loginId);
