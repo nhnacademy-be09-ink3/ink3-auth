@@ -14,3 +14,5 @@ jwt:
   public-key-path: classpath:secret/public.pem
   access-token-validity: 1800000
   refresh-token-validity: 604800000
+front:
+  url: http://localhost:8080

@@ -2,21 +2,29 @@ package shop.ink3.auth.handler;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.util.UriComponentsBuilder;
 import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.exception.DormantException;
 import shop.ink3.auth.exception.InvalidPasswordException;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
 import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
+import shop.ink3.auth.oauth.exception.OAuth2ProviderNotFoundException;
+import shop.ink3.auth.oauth.exception.OAuth2UserNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @Value("${front.url}")
+    private String FRONT_URL;
+
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<CommonResponse<Void>> handleExpiredJwtException(ExpiredJwtException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -35,10 +43,24 @@ public class GlobalExceptionHandler {
                 .body(CommonResponse.error(HttpStatus.UNAUTHORIZED, e.getMessage()));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler({UserNotFoundException.class, OAuth2ProviderNotFoundException.class})
     public ResponseEntity<CommonResponse<Void>> handleUsernameNotFoundException(UserNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(CommonResponse.error(HttpStatus.NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(OAuth2UserNotFoundException.class)
+    public ResponseEntity<Void> handleOAuth2UserNotFoundException(OAuth2UserNotFoundException e) {
+        URI uri = UriComponentsBuilder.fromUriString(FRONT_URL + "/register")
+                .queryParam("provider", e.getUserInfo().provider())
+                .queryParam("providerId", e.getUserInfo().providerId())
+                .queryParam("name", e.getUserInfo().name())
+                .queryParam("gender", e.getUserInfo().gender())
+                .queryParam("email", e.getUserInfo().email())
+                .queryParam("mobile", e.getUserInfo().mobile())
+                .queryParam("birthday", e.getUserInfo().birthday())
+                .build().toUri();
+        return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
     }
 
     @ExceptionHandler(DormantException.class)
