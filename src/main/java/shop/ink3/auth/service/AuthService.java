@@ -31,7 +31,7 @@ public class AuthService {
             userClient.updateUserLastLogin(user.id());
         }
 
-        return tokenService.issueTokens(user, request.userType());
+        return tokenService.issueTokens(user.id(), user.username(), request.userType());
     }
 
     public void logout(String accessToken) {

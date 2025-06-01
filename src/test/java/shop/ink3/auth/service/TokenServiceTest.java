@@ -49,7 +49,7 @@ class TokenServiceTest {
         when(jwtTokenProvider.generateAccessToken(1L, "username", UserType.USER)).thenReturn(accessToken);
         when(jwtTokenProvider.generateRefreshToken(1L, "username", UserType.USER)).thenReturn(refreshToken);
 
-        LoginResponse response = tokenService.issueTokens(user, UserType.USER);
+        LoginResponse response = tokenService.issueTokens(user.id(), user.username(), UserType.USER);
 
         assertThat(response.accessToken().token()).isEqualTo("accessToken");
         assertThat(response.accessToken().expiresAt()).isEqualTo(accessToken.expiresAt());

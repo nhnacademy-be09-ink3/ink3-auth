@@ -43,7 +43,8 @@ class AuthServiceTest {
 
         when(userClient.getUser("test")).thenReturn(CommonResponse.success(user));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(user, UserType.USER)).thenReturn(new LoginResponse(accessToken, refreshToken));
+        when(tokenService.issueTokens(user.id(), user.username(), UserType.USER))
+                .thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
 
@@ -61,7 +62,8 @@ class AuthServiceTest {
 
         when(userClient.getAdmin("test")).thenReturn(CommonResponse.success(admin));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(admin, UserType.ADMIN)).thenReturn(new LoginResponse(accessToken, refreshToken));
+        when(tokenService.issueTokens(admin.id(), admin.username(), UserType.ADMIN))
+                .thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
 

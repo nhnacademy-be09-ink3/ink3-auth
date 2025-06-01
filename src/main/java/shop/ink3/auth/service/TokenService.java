@@ -21,19 +21,19 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final UserClient userClient;
 
-    public LoginResponse issueTokens(AuthResponse user, UserType userType) {
+    public LoginResponse issueTokens(long id, String username, UserType userType) {
         JwtToken accessToken = jwtTokenProvider.generateAccessToken(
-                user.id(),
-                user.username(),
+                id,
+                username,
                 userType
         );
         JwtToken refreshToken = jwtTokenProvider.generateRefreshToken(
-                user.id(),
-                user.username(),
+                id,
+                username,
                 userType
         );
 
-        tokenRepository.saveRefreshToken(user.id(), userType, refreshToken.token());
+        tokenRepository.saveRefreshToken(id, userType, refreshToken.token());
         return new LoginResponse(accessToken, refreshToken);
     }
 
@@ -49,7 +49,7 @@ public class TokenService {
         AuthResponse user = (request.userType() == UserType.ADMIN ? userClient.getAdmin(username)
                 : userClient.getUser(username)).data();
 
-        return issueTokens(user, request.userType());
+        return issueTokens(user.id(), user.username(), request.userType());
     }
 
     public void invalidateTokens(String accessToken) {
