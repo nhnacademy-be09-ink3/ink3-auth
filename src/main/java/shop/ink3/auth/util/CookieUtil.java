@@ -20,7 +20,7 @@ public class CookieUtil {
 
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken.token())
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofMillis(accessToken.expiresAt() - now))
                 .sameSite("Lax")
@@ -28,7 +28,7 @@ public class CookieUtil {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken.token())
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofMillis(refreshToken.expiresAt() - now))
                 .sameSite("Lax")
