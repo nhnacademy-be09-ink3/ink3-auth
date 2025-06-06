@@ -25,12 +25,6 @@ public class AuthService {
             throw new InvalidPasswordException();
         }
 
-        if (request.userType() == UserType.ADMIN) {
-            userClient.updateAdminLastLogin(user.id());
-        } else {
-            userClient.updateUserLastLogin(user.id());
-        }
-
         return tokenService.issueTokens(user.id(), user.username(), request.userType());
     }
 

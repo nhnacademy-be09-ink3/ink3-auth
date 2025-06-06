@@ -34,6 +34,13 @@ public class TokenService {
         );
 
         tokenRepository.saveRefreshToken(id, userType, refreshToken.token());
+
+        if (userType == UserType.ADMIN) {
+            userClient.updateAdminLastLogin(id);
+        } else {
+            userClient.updateUserLastLogin(id);
+        }
+        
         return new LoginResponse(accessToken, refreshToken);
     }
 
