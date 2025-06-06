@@ -57,6 +57,7 @@ class TokenServiceTest {
         assertThat(response.refreshToken().expiresAt()).isEqualTo(refreshToken.expiresAt());
 
         verify(tokenRepository).saveRefreshToken(1L, UserType.USER, "refreshToken");
+        verify(userClient).updateUserLastLogin(1L);
     }
 
     @Test

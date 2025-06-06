@@ -50,7 +50,6 @@ class AuthServiceTest {
 
         assertThat(response.accessToken()).isEqualTo(accessToken);
         assertThat(response.refreshToken()).isEqualTo(refreshToken);
-        verify(userClient).updateUserLastLogin(1L);
     }
 
     @Test
@@ -69,7 +68,6 @@ class AuthServiceTest {
 
         assertThat(response.accessToken()).isEqualTo(accessToken);
         assertThat(response.refreshToken()).isEqualTo(refreshToken);
-        verify(userClient).updateAdminLastLogin(1L);
     }
 
     @Test
