@@ -1,4 +1,4 @@
-package shop.ink3.auth.client.dto;
+package shop.ink3.auth.client.user.dto;
 
 
 public record AuthResponse(

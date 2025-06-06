@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
-import shop.ink3.auth.client.UserClient;
+import shop.ink3.auth.client.user.UserClient;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.SocialUserResponse;
 import shop.ink3.auth.dto.UserType;

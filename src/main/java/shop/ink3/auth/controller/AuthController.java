@@ -20,8 +20,11 @@ import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.LogoutRequest;
 import shop.ink3.auth.dto.PublicKeyResponse;
 import shop.ink3.auth.dto.ReissueRequest;
+import shop.ink3.auth.dto.SendReactiveCodeRequest;
+import shop.ink3.auth.dto.VerifyReactiveCodeRequest;
 import shop.ink3.auth.oauth.service.OAuth2Service;
 import shop.ink3.auth.service.AuthService;
+import shop.ink3.auth.service.ReactiveService;
 import shop.ink3.auth.service.TokenService;
 import shop.ink3.auth.util.CookieUtil;
 import shop.ink3.auth.util.KeyUtils;
@@ -32,6 +35,7 @@ public class AuthController {
     private final AuthService authService;
     private final TokenService tokenService;
     private final OAuth2Service oAuth2Service;
+    private final ReactiveService reactiveService;
     private final PublicKey publicKey;
 
     @Value("${front.url}")
@@ -76,5 +80,17 @@ public class AuthController {
         URI uri = UriComponentsBuilder.fromUriString(FRONT_URL).build().toUri();
         CookieUtil.setTokenCookies(response, tokens.accessToken(), tokens.refreshToken());
         return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
+    }
+
+    @PostMapping("/reactivate/send-code")
+    public ResponseEntity<Void> sendReactivateCode(@RequestBody SendReactiveCodeRequest request) {
+        reactiveService.sendReactiveCode(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reactivate/verify")
+    public ResponseEntity<Void> verifyReactiveCode(@RequestBody VerifyReactiveCodeRequest request) {
+        reactiveService.reactivateUser(request);
+        return ResponseEntity.noContent().build();
     }
 }

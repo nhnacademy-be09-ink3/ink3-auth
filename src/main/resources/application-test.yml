@@ -16,3 +16,5 @@ jwt:
   refresh-token-validity: 604800000
 front:
   url: http://localhost:8080
+dooray:
+  message-url: default
