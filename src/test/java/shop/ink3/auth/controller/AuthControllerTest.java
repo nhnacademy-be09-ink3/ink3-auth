@@ -36,6 +36,7 @@ import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
 import shop.ink3.auth.oauth.service.OAuth2Service;
 import shop.ink3.auth.service.AuthService;
+import shop.ink3.auth.service.ReactiveService;
 import shop.ink3.auth.service.TokenService;
 import shop.ink3.auth.util.KeyUtils;
 
@@ -61,6 +62,9 @@ class AuthControllerTest {
 
     @MockitoBean
     OAuth2Service oAuth2Service;
+
+    @MockitoBean
+    ReactiveService reactiveService;
 
     @Test
     void getPublicKey() throws Exception {
