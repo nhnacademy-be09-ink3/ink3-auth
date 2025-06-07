@@ -16,7 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import shop.ink3.auth.client.dto.CommonResponse;
 import shop.ink3.auth.exception.DormantException;
 import shop.ink3.auth.exception.InvalidPasswordException;
+import shop.ink3.auth.exception.InvalidReactiveCodeException;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
+import shop.ink3.auth.exception.InvalidUserStateException;
 import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
 import shop.ink3.auth.oauth.exception.OAuth2ProviderNotFoundException;
@@ -74,6 +76,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WithdrawnException.class)
     public ResponseEntity<CommonResponse<Void>> handleWithdrawnException(WithdrawnException e) {
         return ResponseEntity.status(HttpStatus.GONE).body(CommonResponse.error(HttpStatus.GONE, e.getMessage()));
+    }
+
+    @ExceptionHandler({InvalidUserStateException.class, InvalidReactiveCodeException.class})
+    public ResponseEntity<CommonResponse<Void>> handleBadRequestException(Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(CommonResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
