@@ -4,8 +4,8 @@ import io.jsonwebtoken.Claims;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import shop.ink3.auth.client.UserClient;
-import shop.ink3.auth.client.dto.AuthResponse;
+import shop.ink3.auth.client.user.UserClient;
+import shop.ink3.auth.client.user.dto.AuthResponse;
 import shop.ink3.auth.dto.JwtToken;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.ReissueRequest;
@@ -21,19 +21,27 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final UserClient userClient;
 
-    public LoginResponse issueTokens(AuthResponse user, UserType userType) {
+    public LoginResponse issueTokens(long id, String username, UserType userType, boolean rememberMe) {
         JwtToken accessToken = jwtTokenProvider.generateAccessToken(
-                user.id(),
-                user.username(),
+                id,
+                username,
                 userType
         );
         JwtToken refreshToken = jwtTokenProvider.generateRefreshToken(
-                user.id(),
-                user.username(),
-                userType
+                id,
+                username,
+                userType,
+                rememberMe
         );
 
-        tokenRepository.saveRefreshToken(user.id(), userType, refreshToken.token());
+        tokenRepository.saveRefreshToken(id, userType, refreshToken.token());
+
+        if (userType == UserType.ADMIN) {
+            userClient.updateAdminLastLogin(id);
+        } else {
+            userClient.updateUserLastLogin(id);
+        }
+
         return new LoginResponse(accessToken, refreshToken);
     }
 
@@ -44,12 +52,15 @@ public class TokenService {
             throw new InvalidRefreshTokenException();
         }
 
-        String username = jwtTokenProvider.parseToken(request.refreshToken()).getSubject();
+        Claims claims = jwtTokenProvider.parseToken(request.refreshToken());
+
+        String username = claims.getSubject();
+        boolean rememberMe = claims.get("rememberMe", Boolean.class);
 
         AuthResponse user = (request.userType() == UserType.ADMIN ? userClient.getAdmin(username)
                 : userClient.getUser(username)).data();
 
-        return issueTokens(user, request.userType());
+        return issueTokens(user.id(), user.username(), request.userType(), rememberMe);
     }
 
     public void invalidateTokens(String accessToken) {

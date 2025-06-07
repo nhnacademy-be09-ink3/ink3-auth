@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import shop.ink3.auth.dto.JwtToken;
@@ -34,10 +35,13 @@ import shop.ink3.auth.exception.InvalidPasswordException;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
 import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
+import shop.ink3.auth.oauth.service.OAuth2Service;
 import shop.ink3.auth.service.AuthService;
+import shop.ink3.auth.service.ReactiveService;
 import shop.ink3.auth.service.TokenService;
 import shop.ink3.auth.util.KeyUtils;
 
+@ActiveProfiles("test")
 @WebMvcTest(
         controllers = AuthController.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class
@@ -57,6 +61,12 @@ class AuthControllerTest {
 
     @MockitoBean
     AuthService authService;
+
+    @MockitoBean
+    OAuth2Service oAuth2Service;
+
+    @MockitoBean
+    ReactiveService reactiveService;
 
     @Test
     void getPublicKey() throws Exception {
@@ -79,7 +89,7 @@ class AuthControllerTest {
 
     @Test
     void login() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER, false);
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
         LoginResponse response = new LoginResponse(accessToken, refreshToken);
@@ -103,7 +113,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithInvalidPassword() throws Exception {
-        LoginRequest request = new LoginRequest("username", "invalidPassword", UserType.USER);
+        LoginRequest request = new LoginRequest("username", "invalidPassword", UserType.USER, false);
         when(authService.login(request)).thenThrow(new InvalidPasswordException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +129,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithUserNotFound() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER, false);
         when(authService.login(request)).thenThrow(new UserNotFoundException());
 
         mockMvc.perform(post("/login")
@@ -136,7 +146,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithDormantUser() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER, false);
         when(authService.login(request)).thenThrow(new DormantException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +162,7 @@ class AuthControllerTest {
 
     @Test
     void loginWithWithDrawnUser() throws Exception {
-        LoginRequest request = new LoginRequest("username", "password", UserType.USER);
+        LoginRequest request = new LoginRequest("username", "password", UserType.USER, false);
         when(authService.login(request)).thenThrow(new WithdrawnException());
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)

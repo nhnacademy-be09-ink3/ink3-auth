@@ -21,6 +21,9 @@ public class JwtTokenProvider {
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidity;
 
+    @Value("${jwt.refresh-token-session-validity}")
+    private long refreshTokenSessionValidity;
+
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
 
@@ -39,14 +42,15 @@ public class JwtTokenProvider {
         return new JwtToken(token, expiry.getTime());
     }
 
-    public JwtToken generateRefreshToken(long id, String username, UserType userType) {
+    public JwtToken generateRefreshToken(long id, String username, UserType userType, boolean rememberMe) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + refreshTokenValidity);
+        Date expiry = new Date(now.getTime() + (rememberMe ? refreshTokenValidity : refreshTokenSessionValidity));
         String token = Jwts.builder()
                 .subject(username)
                 .claim("id", id)
                 .claim("userType", userType.name())
                 .claim("tokenType", "refresh")
+                .claim("rememberMe", rememberMe)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(privateKey, SIG.RS256)

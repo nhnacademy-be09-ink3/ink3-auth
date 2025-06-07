@@ -13,4 +13,9 @@ jwt:
   private-key-path: classpath:secret/private.pem
   public-key-path: classpath:secret/public.pem
   access-token-validity: 1800000
-  refresh-token-validity: 604800000
+  refresh-token-session-validity: 86400000
+  refresh-token-validity: 2592000000
+front:
+  url: http://localhost:8080
+dooray:
+  message-url: default

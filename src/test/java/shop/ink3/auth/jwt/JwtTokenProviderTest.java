@@ -34,6 +34,10 @@ class JwtTokenProviderTest {
         accessField.setAccessible(true);
         accessField.set(jwtTokenProvider, 1000L * 60 * 15); // 15분
 
+        Field refreshSessionField = JwtTokenProvider.class.getDeclaredField("refreshTokenSessionValidity");
+        refreshSessionField.setAccessible(true);
+        refreshSessionField.set(jwtTokenProvider, 1000L * 60 * 60 * 24); // 1일
+
         Field refreshField = JwtTokenProvider.class.getDeclaredField("refreshTokenValidity");
         refreshField.setAccessible(true);
         refreshField.set(jwtTokenProvider, 1000L * 60 * 60 * 24 * 7); // 7일
@@ -52,12 +56,13 @@ class JwtTokenProviderTest {
 
     @Test
     void generateRefreshToken() {
-        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken(1L, "test", UserType.USER);
+        JwtToken jwtToken = jwtTokenProvider.generateRefreshToken(1L, "test", UserType.USER, false);
         Claims claims = jwtTokenProvider.parseToken(jwtToken.token());
         assertThat(claims.getSubject()).isEqualTo("test");
         assertThat(claims.get("id", Long.class)).isEqualTo(1L);
         assertThat(claims.get("userType", String.class)).isEqualTo("USER");
         assertThat(claims.get("tokenType", String.class)).isEqualTo("refresh");
+        assertThat(claims.get("rememberMe", Boolean.class)).isEqualTo(false);
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }
 

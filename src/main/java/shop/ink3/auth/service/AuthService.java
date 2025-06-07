@@ -3,8 +3,8 @@ package shop.ink3.auth.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import shop.ink3.auth.client.UserClient;
-import shop.ink3.auth.client.dto.AuthResponse;
+import shop.ink3.auth.client.user.UserClient;
+import shop.ink3.auth.client.user.dto.AuthResponse;
 import shop.ink3.auth.dto.LoginRequest;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.UserType;
@@ -25,13 +25,7 @@ public class AuthService {
             throw new InvalidPasswordException();
         }
 
-        if (request.userType() == UserType.ADMIN) {
-            userClient.updateAdminLastLogin(user.id());
-        } else {
-            userClient.updateUserLastLogin(user.id());
-        }
-
-        return tokenService.issueTokens(user, request.userType());
+        return tokenService.issueTokens(user.id(), user.username(), request.userType(), request.rememberMe());
     }
 
     public void logout(String accessToken) {
