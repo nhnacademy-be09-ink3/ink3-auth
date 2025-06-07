@@ -1,8 +1,11 @@
 package shop.ink3.auth.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record ReissueRequest(
-        long id,
-        UserType userType,
-        String refreshToken
+        @NotNull Long id,
+        @NotNull UserType userType,
+        @NotBlank String refreshToken
 ) {
 }

@@ -2,6 +2,7 @@ package shop.ink3.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.security.PublicKey;
 import lombok.RequiredArgsConstructor;
@@ -47,25 +48,25 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<CommonResponse<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<CommonResponse<LoginResponse>> reissue(@RequestBody ReissueRequest request) {
+    public ResponseEntity<CommonResponse<LoginResponse>> reissue(@RequestBody @Valid ReissueRequest request) {
         LoginResponse response = tokenService.reissueTokens(request);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
+    public ResponseEntity<Void> logout(@RequestBody @Valid LogoutRequest request) {
         authService.logout(request.accessToken());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/oauth2/authorization/{provider}")
-    public ResponseEntity<Void> getAuthorization(@PathVariable String provider, HttpServletResponse response) {
+    public ResponseEntity<Void> getAuthorization(@PathVariable String provider) {
         URI uri = oAuth2Service.getAuthorizationUri(provider);
         return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
     }
@@ -83,13 +84,13 @@ public class AuthController {
     }
 
     @PostMapping("/reactivate/send-code")
-    public ResponseEntity<Void> sendReactivateCode(@RequestBody SendReactiveCodeRequest request) {
+    public ResponseEntity<Void> sendReactivateCode(@RequestBody @Valid SendReactiveCodeRequest request) {
         reactiveService.sendReactiveCode(request);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/reactivate/verify")
-    public ResponseEntity<Void> verifyReactiveCode(@RequestBody VerifyReactiveCodeRequest request) {
+    public ResponseEntity<Void> verifyReactiveCode(@RequestBody @Valid VerifyReactiveCodeRequest request) {
         reactiveService.reactivateUser(request);
         return ResponseEntity.noContent().build();
     }

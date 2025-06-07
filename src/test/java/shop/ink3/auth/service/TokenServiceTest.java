@@ -3,6 +3,7 @@ package shop.ink3.auth.service;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -47,9 +48,9 @@ class TokenServiceTest {
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(jwtTokenProvider.generateAccessToken(1L, "username", UserType.USER)).thenReturn(accessToken);
-        when(jwtTokenProvider.generateRefreshToken(1L, "username", UserType.USER)).thenReturn(refreshToken);
+        when(jwtTokenProvider.generateRefreshToken(1L, "username", UserType.USER, false)).thenReturn(refreshToken);
 
-        LoginResponse response = tokenService.issueTokens(user.id(), user.username(), UserType.USER);
+        LoginResponse response = tokenService.issueTokens(user.id(), user.username(), UserType.USER, false);
 
         assertThat(response.accessToken().token()).isEqualTo("accessToken");
         assertThat(response.accessToken().expiresAt()).isEqualTo(accessToken.expiresAt());
@@ -67,13 +68,14 @@ class TokenServiceTest {
         Claims claims = mock(Claims.class);
         when(jwtTokenProvider.parseToken("refreshToken")).thenReturn(claims);
         when(claims.getSubject()).thenReturn("username");
+        when(claims.get("rememberMe", Boolean.class)).thenReturn(false);
 
         AuthResponse user = new AuthResponse(1L, "username", "encodedPassword");
         when(userClient.getUser("username")).thenReturn(CommonResponse.success(user));
 
         when(jwtTokenProvider.generateAccessToken(anyLong(), anyString(), any()))
                 .thenReturn(new JwtToken("newAccessToken", 1L));
-        when(jwtTokenProvider.generateRefreshToken(anyLong(), anyString(), any()))
+        when(jwtTokenProvider.generateRefreshToken(anyLong(), anyString(), any(), anyBoolean()))
                 .thenReturn(new JwtToken("newRefreshToken", 2L));
 
         LoginResponse response = tokenService.reissueTokens(request);

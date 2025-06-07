@@ -25,7 +25,7 @@ public class AuthService {
             throw new InvalidPasswordException();
         }
 
-        return tokenService.issueTokens(user.id(), user.username(), request.userType());
+        return tokenService.issueTokens(user.id(), user.username(), request.userType(), request.rememberMe());
     }
 
     public void logout(String accessToken) {

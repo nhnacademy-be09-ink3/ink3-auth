@@ -36,14 +36,14 @@ class AuthServiceTest {
 
     @Test
     void loginUser() {
-        LoginRequest request = new LoginRequest("test", "test", UserType.USER);
+        LoginRequest request = new LoginRequest("test", "test", UserType.USER, false);
         AuthResponse user = new AuthResponse(1L, "test", "encodedPassword");
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(userClient.getUser("test")).thenReturn(CommonResponse.success(user));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(user.id(), user.username(), UserType.USER))
+        when(tokenService.issueTokens(user.id(), user.username(), UserType.USER, false))
                 .thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
@@ -54,14 +54,14 @@ class AuthServiceTest {
 
     @Test
     void loginAdmin() {
-        LoginRequest request = new LoginRequest("test", "test", UserType.ADMIN);
+        LoginRequest request = new LoginRequest("test", "test", UserType.ADMIN, false);
         AuthResponse admin = new AuthResponse(1L, "test", "encodedPassword");
         JwtToken accessToken = new JwtToken("accessToken", 1L);
         JwtToken refreshToken = new JwtToken("refreshToken", 2L);
 
         when(userClient.getAdmin("test")).thenReturn(CommonResponse.success(admin));
         when(passwordEncoder.matches("test", "encodedPassword")).thenReturn(true);
-        when(tokenService.issueTokens(admin.id(), admin.username(), UserType.ADMIN))
+        when(tokenService.issueTokens(admin.id(), admin.username(), UserType.ADMIN, false))
                 .thenReturn(new LoginResponse(accessToken, refreshToken));
 
         LoginResponse response = authService.login(request);
@@ -72,7 +72,7 @@ class AuthServiceTest {
 
     @Test
     void loginWithInvalidPassword() {
-        LoginRequest request = new LoginRequest("test", "invalidPassword", UserType.USER);
+        LoginRequest request = new LoginRequest("test", "invalidPassword", UserType.USER, false);
         AuthResponse user = new AuthResponse(1L, "test", "encodedPassword");
 
         when(userClient.getUser("test")).thenReturn(CommonResponse.success(user));

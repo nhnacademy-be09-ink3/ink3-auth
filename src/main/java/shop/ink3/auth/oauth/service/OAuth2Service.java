@@ -44,7 +44,7 @@ public class OAuth2Service {
         OAuth2UserInfo userInfo = handler.handle(request);
         try {
             SocialUserResponse user = userClient.getSocialUser(userInfo.provider(), userInfo.providerId()).data();
-            return tokenService.issueTokens(user.id(), user.username(), UserType.USER);
+            return tokenService.issueTokens(user.id(), user.username(), UserType.USER, true);
         } catch (UserNotFoundException e) {
             throw new OAuth2UserNotFoundException(userInfo);
         }

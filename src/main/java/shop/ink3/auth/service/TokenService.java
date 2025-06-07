@@ -21,7 +21,7 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final UserClient userClient;
 
-    public LoginResponse issueTokens(long id, String username, UserType userType) {
+    public LoginResponse issueTokens(long id, String username, UserType userType, boolean rememberMe) {
         JwtToken accessToken = jwtTokenProvider.generateAccessToken(
                 id,
                 username,
@@ -30,7 +30,8 @@ public class TokenService {
         JwtToken refreshToken = jwtTokenProvider.generateRefreshToken(
                 id,
                 username,
-                userType
+                userType,
+                rememberMe
         );
 
         tokenRepository.saveRefreshToken(id, userType, refreshToken.token());
@@ -40,7 +41,7 @@ public class TokenService {
         } else {
             userClient.updateUserLastLogin(id);
         }
-        
+
         return new LoginResponse(accessToken, refreshToken);
     }
 
@@ -51,12 +52,15 @@ public class TokenService {
             throw new InvalidRefreshTokenException();
         }
 
-        String username = jwtTokenProvider.parseToken(request.refreshToken()).getSubject();
+        Claims claims = jwtTokenProvider.parseToken(request.refreshToken());
+
+        String username = claims.getSubject();
+        boolean rememberMe = claims.get("rememberMe", Boolean.class);
 
         AuthResponse user = (request.userType() == UserType.ADMIN ? userClient.getAdmin(username)
                 : userClient.getUser(username)).data();
 
-        return issueTokens(user.id(), user.username(), request.userType());
+        return issueTokens(user.id(), user.username(), request.userType(), rememberMe);
     }
 
     public void invalidateTokens(String accessToken) {
