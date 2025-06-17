@@ -61,24 +61,25 @@ class PaycoOAuth2ClientHandlerTest {
     }
 
     @Test
-    void getProvider_returnsPayco() {
+    void getProvider() {
         assertThat(handler.getProvider()).isEqualTo("payco");
     }
 
     @Test
-    void getAuthorizationUri_containsExpectedQueryParams() {
+    void getAuthorizationUri() {
         URI uri = handler.getAuthorizationUri();
         String query = uri.getQuery();
 
-        assertThat(query).contains("response_type=code");
-        assertThat(query).contains("client_id=client-id");
-        assertThat(query).contains("redirect_uri=http://localhost/callback");
-        assertThat(query).contains("serviceProviderCode=FRIENDS");
-        assertThat(query).contains("userLocale=ko_KR");
+        assertThat(query)
+                .contains("response_type=code")
+                .contains("client_id=client-id")
+                .contains("redirect_uri=http://localhost/callback")
+                .contains("serviceProviderCode=FRIENDS")
+                .contains("userLocale=ko_KR");
     }
 
     @Test
-    void handle_successfullyFetchesUserInfo() {
+    void handleWithSuccessfullyFetchesUserInfo() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getParameter("code")).thenReturn("test-code");
 
@@ -119,7 +120,7 @@ class PaycoOAuth2ClientHandlerTest {
     }
 
     @Test
-    void handle_tokenEndpointReturnsNull_throwsException() {
+    void handleWithTokenEndpointReturnsNull() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getParameter("code")).thenReturn("test-code");
 
