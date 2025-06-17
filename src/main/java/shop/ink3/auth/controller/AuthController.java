@@ -40,7 +40,7 @@ public class AuthController {
     private final PublicKey publicKey;
 
     @Value("${front.url}")
-    private String FRONT_URL;
+    private String frontUrl;
 
     @GetMapping("/public-key")
     public ResponseEntity<CommonResponse<PublicKeyResponse>> getPublicKey() {
@@ -78,7 +78,7 @@ public class AuthController {
             HttpServletResponse response
     ) {
         LoginResponse tokens = oAuth2Service.processOAuth2Callback(provider, request);
-        URI uri = UriComponentsBuilder.fromUriString(FRONT_URL).build().toUri();
+        URI uri = UriComponentsBuilder.fromUriString(frontUrl).build().toUri();
         CookieUtil.setTokenCookies(response, tokens.accessToken(), tokens.refreshToken());
         return ResponseEntity.status(HttpStatus.FOUND).location(uri).build();
     }
