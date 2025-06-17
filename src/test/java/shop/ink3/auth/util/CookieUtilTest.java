@@ -21,11 +21,12 @@ class CookieUtilTest {
         String accessCookie = response.getHeaders(HttpHeaders.SET_COOKIE).get(0);
         String refreshCookie = response.getHeaders(HttpHeaders.SET_COOKIE).get(1);
 
-        assertThat(accessCookie).contains("accessToken=access");
-        assertThat(accessCookie).contains("HttpOnly");
-        assertThat(accessCookie).contains("Secure");
-        assertThat(accessCookie).contains("Path=/");
-        assertThat(accessCookie).contains("SameSite=Lax");
+        assertThat(accessCookie)
+                .contains("accessToken=access")
+                .contains("HttpOnly")
+                .contains("Secure")
+                .contains("Path=/")
+                .contains("SameSite=Lax");
 
         assertThat(refreshCookie).contains("refreshToken=refresh");
     }
