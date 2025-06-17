@@ -21,6 +21,7 @@ import shop.ink3.auth.exception.InvalidRefreshTokenException;
 import shop.ink3.auth.exception.InvalidUserStateException;
 import shop.ink3.auth.exception.UserNotFoundException;
 import shop.ink3.auth.exception.WithdrawnException;
+import shop.ink3.auth.oauth.exception.OAuth2AuthenticationException;
 import shop.ink3.auth.oauth.exception.OAuth2ProviderNotFoundException;
 import shop.ink3.auth.oauth.exception.OAuth2UserNotFoundException;
 
@@ -28,7 +29,7 @@ import shop.ink3.auth.oauth.exception.OAuth2UserNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @Value("${front.url}")
-    private String FRONT_URL;
+    private String frontUrl;
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<CommonResponse<Void>> handleExpiredJwtException(ExpiredJwtException e) {
@@ -42,7 +43,11 @@ public class GlobalExceptionHandler {
                 .body(CommonResponse.error(HttpStatus.UNAUTHORIZED, "Invalid JWT token."));
     }
 
-    @ExceptionHandler({InvalidPasswordException.class, InvalidRefreshTokenException.class})
+    @ExceptionHandler({
+            InvalidPasswordException.class,
+            InvalidRefreshTokenException.class,
+            OAuth2AuthenticationException.class
+    })
     public ResponseEntity<CommonResponse<Void>> handleUnauthorizedException(Exception e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(CommonResponse.error(HttpStatus.UNAUTHORIZED, e.getMessage()));
@@ -56,7 +61,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OAuth2UserNotFoundException.class)
     public ResponseEntity<Void> handleOAuth2UserNotFoundException(OAuth2UserNotFoundException e) {
-        URI uri = UriComponentsBuilder.fromUriString(FRONT_URL + "/register")
+        URI uri = UriComponentsBuilder.fromUriString(frontUrl + "/register")
                 .queryParam("provider", e.getUserInfo().provider())
                 .queryParam("providerId", e.getUserInfo().providerId())
                 .queryParam("name", e.getUserInfo().name())

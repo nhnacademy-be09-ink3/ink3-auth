@@ -1,5 +1,7 @@
 package shop.ink3.auth.oauth.dto;
 
+import java.io.Serializable;
+
 public record OAuth2UserInfo(
         String provider,
         String providerId,
@@ -8,5 +10,5 @@ public record OAuth2UserInfo(
         String email,
         String mobile,
         String birthday
-) {
+) implements Serializable {
 }

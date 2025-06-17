@@ -62,7 +62,7 @@ class JwtTokenProviderTest {
         assertThat(claims.get("id", Long.class)).isEqualTo(1L);
         assertThat(claims.get("userType", String.class)).isEqualTo("USER");
         assertThat(claims.get("tokenType", String.class)).isEqualTo("refresh");
-        assertThat(claims.get("rememberMe", Boolean.class)).isEqualTo(false);
+        assertThat(claims.get("rememberMe", Boolean.class)).isFalse();
         assertThat(claims.getExpiration().getTime()).isCloseTo(jwtToken.expiresAt(), within(5000L));
     }
 

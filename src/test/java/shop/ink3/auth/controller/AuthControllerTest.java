@@ -1,16 +1,23 @@
 package shop.ink3.auth.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
@@ -19,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,7 +37,9 @@ import shop.ink3.auth.dto.LoginRequest;
 import shop.ink3.auth.dto.LoginResponse;
 import shop.ink3.auth.dto.LogoutRequest;
 import shop.ink3.auth.dto.ReissueRequest;
+import shop.ink3.auth.dto.SendReactiveCodeRequest;
 import shop.ink3.auth.dto.UserType;
+import shop.ink3.auth.dto.VerifyReactiveCodeRequest;
 import shop.ink3.auth.exception.DormantException;
 import shop.ink3.auth.exception.InvalidPasswordException;
 import shop.ink3.auth.exception.InvalidRefreshTokenException;
@@ -291,5 +301,66 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent())
                 .andDo(print());
+    }
+
+    @Test
+    void getAuthorization() throws Exception {
+        when(oAuth2Service.getAuthorizationUri("payco"))
+                .thenReturn(new URI("https://auth"));
+
+        mockMvc.perform(get("/oauth2/authorization/payco"))
+                .andExpect(status().isFound())
+                .andExpect(header().string(HttpHeaders.LOCATION, "https://auth"))
+                .andDo(print());
+
+        verify(oAuth2Service).getAuthorizationUri("payco");
+    }
+
+    @Test
+    void oauth2Callback() throws Exception {
+        long now = System.currentTimeMillis();
+        LoginResponse tokens = new LoginResponse(
+                new JwtToken("access", now + 10000),
+                new JwtToken("refresh", now + 20000)
+        );
+        when(oAuth2Service.processOAuth2Callback(eq("payco"), any(HttpServletRequest.class)))
+                .thenReturn(tokens);
+
+        mockMvc.perform(get("/oauth2/callback/payco"))
+                .andExpect(status().isFound())
+                .andExpect(header().string(HttpHeaders.LOCATION, "http://localhost:8080"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andDo(print());
+
+        verify(oAuth2Service).processOAuth2Callback(eq("payco"), any(HttpServletRequest.class));
+    }
+
+    @Test
+    void sendReactivateCode() throws Exception {
+        SendReactiveCodeRequest request = new SendReactiveCodeRequest("user");
+        doNothing().when(reactiveService).sendReactiveCode(request);
+
+        mockMvc.perform(post("/reactivate/send-code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(reactiveService).sendReactiveCode(request);
+    }
+
+    @Test
+    void verifyReactiveCode() throws Exception {
+        VerifyReactiveCodeRequest request = new VerifyReactiveCodeRequest("user", "123456");
+        doNothing().when(reactiveService).reactivateUser(request);
+
+        mockMvc.perform(post("/reactivate/verify")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(reactiveService).reactivateUser(request);
     }
 }
